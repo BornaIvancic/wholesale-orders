@@ -11,3 +11,27 @@ User.find_or_create_by!(email: "admin@example.com") do |u|
   u.password = "password123"
   u.role = :admin
 end
+User.find_or_create_by!(email: "admin@example.com") do |u|
+  u.password = "password123"
+  u.role = :admin
+end
+
+company = Company.find_or_create_by!(name: "Demo Partner d.o.o.")
+
+User.find_or_create_by!(email: "partner@example.com") do |u|
+  u.password = "password123"
+  u.role = :partner_user
+  u.company = company
+end
+
+[
+  { name: "Graševina 0.75L", sku: "GRA-075", price_cents: 890 },
+  { name: "Malvazija 0.75L", sku: "MAL-075", price_cents: 990 },
+  { name: "Plavac Mali 0.75L", sku: "PLA-075", price_cents: 1290 }
+].each do |attrs|
+  Product.find_or_create_by!(sku: attrs[:sku]) do |p|
+    p.name = attrs[:name]
+    p.price_cents = attrs[:price_cents]
+    p.active = true
+  end
+end
