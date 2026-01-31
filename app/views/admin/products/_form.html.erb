@@ -1,0 +1,37 @@
+<%= form_with model: [:admin, @product], local: true do |f| %>
+  <% if @product.errors.any? %>
+    <div class="mb-4 p-3 border border-red-400 bg-red-50">
+      <ul>
+        <% @product.errors.full_messages.each do |msg| %>
+          <li class="text-red-700"><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-4">
+    <%= f.label :name, "Naziv", class: "block font-semibold" %>
+    <%= f.text_field :name, class: "border p-2 w-full" %>
+  </div>
+
+  <div class="mb-4">
+    <%= f.label :sku, "SKU", class: "block font-semibold" %>
+    <%= f.text_field :sku, class: "border p-2 w-full" %>
+  </div>
+
+  <div class="mb-4">
+    <%= f.label :price_cents, "Cijena (u centima)", class: "block font-semibold" %>
+    <%= f.number_field :price_cents, class: "border p-2 w-full" %>
+  </div>
+
+  <div class="mb-4">
+    <%= f.label :active, "Aktivan" %>
+    <%= f.check_box :active %>
+  </div>
+
+  <div class="mt-6">
+    <%= f.submit class: "px-4 py-2 bg-green-600 text-white rounded" %>
+    <%= link_to "Odustani", admin_products_path,
+                class: "ml-4 underline" %>
+  </div>
+<% end %>
