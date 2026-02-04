@@ -27,6 +27,7 @@
   <nav class="bg-gray-800 text-white px-6 py-4 flex gap-4">
     <%= link_to "Home", root_path, class: "hover:underline" %>
     <%= link_to "Katalog", products_path, class: "hover:underline" %>
+    <%= link_to "Narudžbe", orders_path, class: "hover:underline" %>
 
     <% if user_signed_in? %>
       <%= link_to "Profil", profile_path, class: "hover:underline" %>

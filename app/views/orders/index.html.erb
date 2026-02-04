@@ -1,0 +1,26 @@
+<h1 class="text-2xl font-bold mb-6">Moje narudžbe</h1>
+
+<table class="w-full border-collapse">
+  <thead>
+  <tr class="border-b">
+    <th class="text-left p-2">Narudžba</th>
+    <th class="text-left p-2">Status</th>
+    <th class="text-left p-2">Ukupno</th>
+    <th class="text-left p-2">Datum</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @orders.each do |order| %>
+    <tr class="border-b">
+      <td class="p-2">
+        <%= link_to "##{order.id}", order_path(order), class: "underline" %>
+      </td>
+      <td class="p-2"><%= order.status %></td>
+      <td class="p-2">
+        <%= number_to_currency(order.grand_total_cents / 100.0, unit: "€") %>
+      </td>
+      <td class="p-2"><%= l(order.created_at, format: :short) %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>

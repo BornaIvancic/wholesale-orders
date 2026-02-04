@@ -1,0 +1,30 @@
+<h1 class="text-2xl font-bold mb-4">Narudžba #<%= @order.id %></h1>
+<p>Partner: <strong><%= @order.company.name %></strong></p>
+<p>Status: <strong><%= @order.status %></strong></p>
+
+<table class="w-full border-collapse mt-6">
+  <thead>
+  <tr class="border-b">
+    <th class="text-left p-2">Proizvod</th>
+    <th class="text-left p-2">Količina</th>
+    <th class="text-left p-2">Jed. cijena</th>
+    <th class="text-left p-2">Ukupno</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @order.order_items.includes(:product).each do |item| %>
+    <tr class="border-b">
+      <td class="p-2"><%= item.product.name %></td>
+      <td class="p-2"><%= item.quantity %></td>
+      <td class="p-2"><%= number_to_currency(item.unit_price_cents / 100.0, unit: "€") %></td>
+      <td class="p-2"><%= number_to_currency(item.line_total_cents / 100.0, unit: "€") %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+
+<div class="mt-4 space-y-1">
+  <p>Subtotal: <%= number_to_currency(@order.subtotal_cents / 100.0, unit: "€") %></p>
+  <p>PDV (25%): <%= number_to_currency(@order.vat_cents / 100.0, unit: "€") %></p>
+  <p class="font-bold">Ukupno s PDV-om: <%= number_to_currency(@order.grand_total_cents / 100.0, unit: "€") %></p>
+</div>

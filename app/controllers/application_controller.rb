@@ -19,4 +19,7 @@ class ApplicationController < ActionController::Base
     def show
     end
   end
+  rescue_from ActiveRecord::RecordNotFound do
+    redirect_to root_path, alert: "Traženi zapis ne postoji ili nemate pristup."
+  end
 end
