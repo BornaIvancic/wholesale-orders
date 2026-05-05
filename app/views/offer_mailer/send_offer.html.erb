@@ -1,0 +1,31 @@
+<p>Poštovani,</p>
+
+<p>
+  u privitku se nalazi ponuda <strong><%= @offer.number %></strong>
+  vezana uz narudžbu #<%= @order.id %>.
+</p>
+
+<p>
+  <strong>Iznos ponude:</strong>
+  <%= number_to_currency(@order.total_cents / 100.0, unit: "€") %>
+</p>
+
+<p>
+  <strong>Rok plaćanja:</strong>
+  <% if @order.due_date.present? %>
+    <%= l(@order.due_date) %>
+  <% else %>
+    <%= @company.payment_terms_days %> dana od datuma izdavanja
+  <% end %>
+</p>
+
+<p>
+  Za sva dodatna pitanja stojimo vam na raspolaganju.
+</p>
+
+<br>
+
+<p>
+  Srdačan pozdrav,<br>
+  <strong><%= Rails.application.class.module_parent_name %></strong>
+</p>

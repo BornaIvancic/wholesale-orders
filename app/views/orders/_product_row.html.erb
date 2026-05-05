@@ -1,0 +1,76 @@
+<% out_of_stock = product.stock_quantity.to_i <= 0 %>
+<% unavailable = !product.active? || out_of_stock %>
+
+<tr id="product-<%= product.id %>" class="transition <%= unavailable ? 'bg-gray-50 text-gray-400' : 'hover:bg-gray-50' %>">
+  <td class="px-4 py-3 font-medium">
+    <div class="flex items-center gap-3">
+      <% if product.image_url.present? %>
+        <%= image_tag product.image_url, class: "w-14 h-14 object-cover rounded border border-gray-200" %>
+      <% end %>
+
+      <div>
+        <div><%= product.name %></div>
+        <div class="text-xs text-gray-500">SKU: <%= product.sku %></div>
+
+        <% if out_of_stock %>
+          <span class="ml-0 text-xs font-semibold text-red-600">Nema na zalihi</span>
+        <% end %>
+
+        <% if !product.active? %>
+          <span class="ml-0 text-xs font-semibold text-gray-500">Nedostupan</span>
+        <% end %>
+
+        <% if selected_items[product.id.to_s].to_i > 0 %>
+          <div class="mt-1 text-xs font-semibold text-green-700">
+            Dodano u narudžbu: <%= selected_items[product.id.to_s] %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </td>
+
+  <td class="px-4 py-3 text-gray-600">
+    <%= number_to_currency(product.vpc_cents / 100.0, unit: "€") %>
+  </td>
+
+  <td class="px-4 py-3 text-gray-600">
+    <%= number_to_currency(product.pdv_cents / 100.0, unit: "€") %>
+  </td>
+
+  <td class="px-4 py-3 text-gray-600 font-semibold">
+    <%= number_to_currency(product.mpc_cents / 100.0, unit: "€") %>
+  </td>
+
+  <td class="px-4 py-3 text-gray-600">
+    <%= product.category.presence || "-" %>
+  </td>
+
+  <td class="px-4 py-3">
+    <% if out_of_stock %>
+      <span class="text-red-600 font-semibold">0</span>
+    <% else %>
+      <span class="text-gray-700"><%= product.stock_quantity %></span>
+    <% end %>
+  </td>
+
+  <td colspan="2" class="px-4 py-3">
+    <%= form_with url: add_item_orders_path, method: :post, class: "flex items-center gap-2" do %>
+      <%= hidden_field_tag :product_id, product.id %>
+
+      <% [:query, :category, :availability, :sort, :page].each do |key| %>
+        <%= hidden_field_tag key, params[key] if params[key].present? %>
+      <% end %>
+
+      <%= number_field_tag :quantity,
+                           selected_items[product.id.to_s] || 1,
+                           min: 1,
+                           max: product.stock_quantity.to_i,
+                           disabled: unavailable,
+                           class: "w-24 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-200 disabled:text-gray-500" %>
+
+      <%= submit_tag "Dodaj u narudžbu",
+                     disabled: unavailable,
+                     class: "px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 transition disabled:bg-gray-300 disabled:text-gray-600 disabled:cursor-not-allowed" %>
+    <% end %>
+  </td>
+</tr>

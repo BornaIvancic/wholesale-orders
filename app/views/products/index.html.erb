@@ -1,11 +1,135 @@
-<h1 class="text-2xl font-bold mb-4">Katalog proizvoda</h1>
+<h1 class="text-3xl font-bold mb-8">Katalog proizvoda</h1>
 
-<div class="grid gap-4">
+<div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4 mb-6">
+  <%= form_with url: products_path, method: :get, local: true,
+                class: "grid grid-cols-1 md:grid-cols-5 gap-4 items-end" do |f| %>
+
+    <!-- SEARCH -->
+    <div>
+      <%= f.label :query, "Pretraži", class: "block text-sm font-medium mb-1" %>
+      <%= f.text_field :query,
+                       value: params[:query],
+                       placeholder: "Naziv ili SKU",
+                       class: "w-full rounded-lg border-gray-300" %>
+    </div>
+
+    <!-- CATEGORY -->
+    <div>
+      <%= f.label :category, "Kategorija", class: "block text-sm font-medium mb-1" %>
+      <%= f.select :category,
+                   options_for_select(@categories, params[:category]),
+                   { include_blank: "Sve kategorije" },
+                   class: "w-full rounded-lg border-gray-300" %>
+    </div>
+
+    <!-- AVAILABILITY -->
+    <div>
+      <%= f.label :availability, "Dostupnost", class: "block text-sm font-medium mb-1" %>
+      <%= f.select :availability,
+                   options_for_select([
+                                        ["Sve", ""],
+                                        ["Na zalihi", "in_stock"],
+                                        ["Nema na zalihi", "out_of_stock"]
+                                      ], params[:availability]),
+                   {},
+                   class: "w-full rounded-lg border-gray-300" %>
+    </div>
+
+    <!-- SORT -->
+    <div>
+      <%= f.label :sort, "Sortiranje", class: "block text-sm font-medium mb-1" %>
+      <%= f.select :sort,
+                   options_for_select([
+                                        ["Naziv A-Z", "name_asc"],
+                                        ["Naziv Z-A", "name_desc"],
+                                        ["Cijena uzlazno", "price_asc"],
+                                        ["Cijena silazno", "price_desc"]
+                                      ], params[:sort]),
+                   {},
+                   class: "w-full rounded-lg border-gray-300" %>
+    </div>
+
+    <!-- BUTTONS -->
+    <div class="flex gap-2">
+      <%= f.submit "Primijeni",
+                   class: "px-4 py-2 bg-blue-600 text-white rounded-lg" %>
+
+      <%= link_to "Reset",
+                  products_path,
+                  class: "px-4 py-2 bg-gray-200 rounded-lg" %>
+    </div>
+
+  <% end %>
+</div>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
   <% @products.each do |product| %>
-    <div class="border rounded p-4">
-      <div class="font-semibold"><%= link_to product.name, product_path(product) %></div>
-      <div class="text-sm text-gray-600">SKU: <%= product.sku %></div>
-      <div class="mt-2"><%= number_to_currency(product.price_cents / 100.0, unit: "€") %></div>
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition p-6 flex flex-col justify-between">
+      <% if product.image_url.present? %>
+        <div class="mb-4">
+          <%= image_tag product.image_url,
+                        class: "w-full h-56 object-cover rounded-lg border border-gray-200 bg-gray-50" %>
+        </div>
+      <% else %>
+        <div class="mb-4 w-full h-56 rounded-lg border border-gray-200 bg-gray-100 flex items-center justify-center text-gray-400 text-sm">
+          Nema slike
+        </div>
+      <% end %>
+
+      <div>
+        <h2 class="text-lg font-semibold text-gray-900 mb-1">
+          <%= link_to product.name,
+                      product_path(product),
+                      class: "hover:underline" %>
+        </h2>
+
+        <p class="text-sm text-gray-500 mb-2">
+          SKU: <%= product.sku %>
+        </p>
+
+        <!-- STOCK STATUS -->
+        <% if product.stock_quantity.to_i > 0 %>
+          <p class="text-sm text-green-600 font-medium">
+            Na zalihi: <%= product.stock_quantity %>
+          </p>
+        <% else %>
+          <p class="text-sm text-red-600 font-semibold">
+            Nema na zalihi
+          </p>
+        <% end %>
+      </div>
+
+      <div class="mt-4 space-y-1">
+        <p class="text-sm text-gray-600">
+          VPC:
+          <span class="font-semibold text-gray-900">
+            <%= number_to_currency(product.vpc_cents / 100.0, unit: "€") %>
+          </span>
+        </p>
+
+        <p class="text-sm text-gray-600">
+          MPC:
+          <span class="font-semibold text-blue-600">
+            <%= number_to_currency(product.mpc_cents / 100.0, unit: "€") %>
+          </span>
+        </p>
+      </div>
+
+      <div class="mt-6">
+        <% if product.stock_quantity.to_i > 0 %>
+          <%= link_to "Pogledaj detalje",
+                      product_path(product),
+                      class: "block text-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition" %>
+        <% else %>
+          <div class="block text-center px-4 py-2 bg-gray-300 text-gray-600 font-semibold rounded-lg cursor-not-allowed">
+            Nije dostupno
+          </div>
+        <% end %>
+      </div>
+
     </div>
   <% end %>
+</div>
+<div class="mt-8 flex justify-center">
+  <%= paginate @products %>
 </div>

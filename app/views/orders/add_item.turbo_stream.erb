@@ -1,0 +1,15 @@
+<%= turbo_stream.replace "selected-items-summary" do %>
+  <%= render "selected_items_summary", selected_items: @selected_items %>
+<% end %>
+
+<%= turbo_stream.replace "product-#{@product.id}" do %>
+  <%= render "product_row", product: @product, selected_items: @selected_items %>
+<% end %>
+
+<%= turbo_stream.update "flash" do %>
+  <%= render "shared/flash" %>
+<% end %>
+
+<%= turbo_stream.replace "flash" do %>
+  <%= render "shared/flash" %>
+<% end %>

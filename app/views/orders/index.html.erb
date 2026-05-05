@@ -1,26 +1,126 @@
-<h1 class="text-2xl font-bold mb-6">Moje narudžbe</h1>
+<div class="max-w-6xl mx-auto">
 
-<table class="w-full border-collapse">
-  <thead>
-  <tr class="border-b">
-    <th class="text-left p-2">Narudžba</th>
-    <th class="text-left p-2">Status</th>
-    <th class="text-left p-2">Ukupno</th>
-    <th class="text-left p-2">Datum</th>
-  </tr>
-  </thead>
-  <tbody>
-  <% @orders.each do |order| %>
-    <tr class="border-b">
-      <td class="p-2">
-        <%= link_to "##{order.id}", order_path(order), class: "underline" %>
-      </td>
-      <td class="p-2"><%= order.status %></td>
-      <td class="p-2">
-        <%= number_to_currency(order.grand_total_cents / 100.0, unit: "€") %>
-      </td>
-      <td class="p-2"><%= l(order.created_at, format: :short) %></td>
-    </tr>
-  <% end %>
-  </tbody>
-</table>
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold">Moje narudžbe</h1>
+
+    <% if current_user.partner_user? %>
+      <%= link_to "➕ Nova narudžba",
+                  new_order_path,
+                  class: "px-5 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition" %>
+    <% end %>
+  </div>
+  <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4 mb-6">
+    <%= form_with url: orders_path, method: :get, local: true,
+                  class: "grid grid-cols-1 md:grid-cols-4 gap-4 items-end" do |f| %>
+
+      <div>
+        <%= f.label :query, "Pretraži po ID-u", class: "block text-sm font-medium mb-1" %>
+        <%= f.text_field :query,
+                         value: params[:query],
+                         placeholder: "npr. 123",
+                         class: "w-full rounded-lg border-gray-300" %>
+      </div>
+
+      <div>
+        <%= f.label :status, "Status", class: "block text-sm font-medium mb-1" %>
+        <%= f.select :status,
+                     options_for_select(
+                       [["Svi statusi", ""]] + Order.statuses.keys.map { |s| [s.humanize, s] },
+                       params[:status]
+                     ),
+                     {},
+                     class: "w-full rounded-lg border-gray-300" %>
+      </div>
+
+      <div>
+        <%= f.label :sort, "Sortiranje", class: "block text-sm font-medium mb-1" %>
+        <%= f.select :sort,
+                     options_for_select([
+                                          ["Najnovije", "newest"],
+                                          ["Najstarije", "oldest"],
+                                          ["Ukupno uzlazno", "total_asc"],
+                                          ["Ukupno silazno", "total_desc"]
+                                        ], params[:sort]),
+                     {},
+                     class: "w-full rounded-lg border-gray-300" %>
+      </div>
+
+      <div class="flex gap-2">
+        <%= f.submit "Primijeni",
+                     class: "px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition" %>
+
+        <%= link_to "Reset",
+                    orders_path,
+                    class: "px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition" %>
+      </div>
+
+    <% end %>
+  </div>
+
+  <div class="bg-white rounded-xl shadow overflow-hidden">
+    <table class="w-full">
+      <thead class="bg-gray-50 text-gray-600 text-sm uppercase tracking-wide">
+      <tr>
+        <th class="text-left px-4 py-3">Narudžba</th>
+        <th class="text-left px-4 py-3">Status</th>
+        <th class="text-left px-4 py-3">Ukupno</th>
+        <th class="text-left px-4 py-3">Datum</th>
+      </tr>
+      </thead>
+
+      <tbody class="divide-y">
+      <% @orders.each do |order| %>
+        <tr class="hover:bg-gray-50 transition">
+          <td class="px-4 py-3 font-medium">
+            <%= link_to "##{order.id}",
+                        order_path(order),
+                        class: "text-blue-600 hover:underline" %>
+          </td>
+
+          <td class="px-4 py-3">
+              <span class="px-2 py-1 text-xs font-semibold rounded-full
+                <%=
+                case order.status
+                when "submitted" then "bg-yellow-100 text-yellow-700"
+                when "approved"  then "bg-blue-100 text-blue-700"
+                when "shipped"   then "bg-indigo-100 text-indigo-700"
+                when "delivered" then "bg-green-100 text-green-700"
+                when "rejected"  then "bg-red-100 text-red-700"
+                else "bg-gray-100 text-gray-600"
+                end
+              %>">
+                <%= order.status.humanize %>
+              </span>
+
+            <% if order.overdue? %>
+                <span class="ml-2 px-2 py-1 text-xs font-bold rounded bg-red-600 text-white">
+                  KASNI
+                </span>
+            <% end %>
+          </td>
+
+          <td class="px-4 py-3 font-semibold">
+            <%= number_to_currency(order.total_cents / 100.0, unit: "€") %>
+          </td>
+
+          <td class="px-4 py-3 text-gray-600 text-sm">
+            <%= l(order.created_at, format: "%d.%m.%Y. %H:%M") %>
+          </td>
+        </tr>
+      <% end %>
+
+      <% if @orders.empty? %>
+        <tr>
+          <td colspan="4" class="text-center py-10 text-gray-500">
+            Trenutno nema narudžbi.
+          </td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+<div class="mt-6 flex justify-center">
+  <%= paginate @orders %>
+</div>

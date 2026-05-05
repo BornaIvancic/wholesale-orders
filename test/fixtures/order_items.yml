@@ -1,15 +1,13 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
 one:
   order: one
   product: one
-  quantity: 1
-  unit_price_cents: 1
-  line_total_cents: 1
+  quantity: 2
+  unit_price_cents: 1000
+  line_total_cents: 2000
 
 two:
   order: two
   product: two
   quantity: 1
-  unit_price_cents: 1
-  line_total_cents: 1
+  unit_price_cents: 2000
+  line_total_cents: 2000

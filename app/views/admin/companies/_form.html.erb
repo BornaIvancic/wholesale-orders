@@ -1,0 +1,84 @@
+<div class="bg-white border border-gray-200 rounded-xl shadow-sm">
+  <div class="p-6">
+    <%= form_with model: [:admin, @company], class: "space-y-6" do |f| %>
+
+      <% if @company.errors.any? %>
+        <div class="rounded-lg border border-red-200 bg-red-50 p-4">
+          <div class="font-semibold text-red-800 mb-2">Provjerite unesena polja:</div>
+          <ul class="list-disc pl-6 text-sm text-red-800 space-y-1">
+            <% @company.errors.full_messages.each do |m| %>
+              <li><%= m %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div class="md:col-span-2">
+          <%= f.label :name, "Naziv", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.text_field :name,
+                           class: "mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500",
+                           placeholder: "npr. Vivat Fina Vina d.o.o." %>
+        </div>
+
+        <div>
+          <%= f.label :oib, "OIB", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.text_field :oib,
+                           class: "mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500",
+                           placeholder: "npr. 12345678901" %>
+        </div>
+
+        <div>
+          <%= f.label :offers_email, "E-pošta za ponude", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.email_field :offers_email,
+                            class: "mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500",
+                            placeholder: "npr. ponude@firma.hr" %>
+        </div>
+
+        <div class="md:col-span-2">
+          <%= f.label :street_address, "Ulica i broj", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.text_field :street_address,
+                           class: "mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500",
+                           placeholder: "npr. Ilica 15" %>
+        </div>
+
+        <div>
+          <%= f.label :postal_code, "Poštanski broj", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.text_field :postal_code,
+                           class: "mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500",
+                           placeholder: "npr. 10000" %>
+        </div>
+
+        <div>
+          <%= f.label :city, "Grad", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.text_field :city,
+                           class: "mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500",
+                           placeholder: "npr. Zagreb" %>
+        </div>
+
+        <div>
+          <%= f.label :discount_percent, "Rabat (%)", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.number_field :discount_percent,
+                             min: 0, max: 100,
+                             class: "mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+        </div>
+
+        <div>
+          <%= f.label :payment_terms_days, "Odgoda plaćanja (dani)", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.number_field :payment_terms_days,
+                             min: 0, max: 365,
+                             class: "mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+        </div>
+      </div>
+
+      <div class="pt-4 border-t border-gray-100 flex flex-col sm:flex-row gap-3 sm:justify-end">
+        <%= link_to "Natrag",
+                    admin_companies_path,
+                    class: "inline-flex justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50" %>
+
+        <%= f.submit (@company.new_record? ? "Kreiraj partnera" : "Spremi promjene"),
+                     class: "inline-flex justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700" %>
+      </div>
+    <% end %>
+  </div>
+</div>

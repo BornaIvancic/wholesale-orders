@@ -1,15 +1,13 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
 one:
   order: one
-  changed_by_id: 1
+  changed_by: admin
   from_status: 1
-  to_status: 1
-  note: MyString
+  to_status: 2
+  note: Status promijenjen
 
 two:
   order: two
-  changed_by_id: 1
-  from_status: 1
-  to_status: 1
-  note: MyString
+  changed_by: admin
+  from_status: 2
+  to_status: 4
+  note: Narudžba u obradi

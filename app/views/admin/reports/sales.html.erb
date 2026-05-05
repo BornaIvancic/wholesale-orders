@@ -1,0 +1,18 @@
+<%# app/views/admin/reports/sales.html.erb %>
+<%= link_to "← Natrag", request.referer || root_path,
+            class: "inline-block px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-semibold transition" %>
+<h1 class="text-2xl font-bold mb-2">Prodaja po periodu</h1>
+<p class="text-sm text-gray-600 mb-6"><%= @from %> → <%= @to %></p>
+
+<%= render "range_form", url: sales_admin_reports_path %>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+  <div class="bg-white border rounded-lg p-4">
+    <div class="text-sm text-gray-600">Broj narudžbi</div>
+    <div class="text-2xl font-bold"><%= @orders_count %></div>
+  </div>
+  <div class="bg-white border rounded-lg p-4">
+    <div class="text-sm text-gray-600">Prihod</div>
+    <div class="text-2xl font-bold"><%= number_to_currency(@revenue_cents / 100.0, unit: "€") %></div>
+  </div>
+</div>

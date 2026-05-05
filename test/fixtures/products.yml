@@ -1,13 +1,13 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
 one:
-  name: MyString
-  sku: MyString
-  price_cents: 1
-  active: false
+  name: Proizvod 1
+  sku: SKU001
+  price_cents: 1000
+  stock_quantity: 10
+  active: true
 
 two:
-  name: MyString
-  sku: MyString
-  price_cents: 1
-  active: false
+  name: Proizvod 2
+  sku: SKU002
+  price_cents: 2000
+  stock_quantity: 5
+  active: true

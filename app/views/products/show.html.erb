@@ -1,10 +1,68 @@
-<h1 class="text-2xl font-bold"><%= @product.name %></h1>
+<div class="max-w-3xl mx-auto">
+  <div class="bg-white shadow rounded-lg p-8">
 
-<p class="text-gray-600 mt-2">SKU: <%= @product.sku %></p>
-<p class="mt-4 text-lg">
-  Cijena: <%= number_to_currency(@product.price_cents / 100.0, unit: "€") %>
-</p>
+    <h1 class="text-3xl font-bold mb-2"><%= @product.name %></h1>
+    <% if @product.image_url.present? %>
+      <div class="mb-6">
+        <%= image_tag @product.image_url,
+                      class: "w-full max-w-md h-auto object-cover rounded-xl border border-gray-200" %>
+      </div>
+    <% end %>
 
-<div class="mt-6">
-  <%= link_to "← Natrag na katalog", products_path, class: "underline" %>
+    <p class="text-sm text-gray-500 mb-4">
+      SKU: <span class="font-medium text-gray-700"><%= @product.sku %></span>
+    </p>
+
+    <div class="mb-4">
+      <% if @product.stock_quantity.to_i > 0 %>
+        <div class="inline-flex items-center px-3 py-1 text-xs font-semibold bg-green-100 text-green-700 rounded">
+          Na zalihi: <%= @product.stock_quantity %>
+        </div>
+      <% else %>
+        <div class="inline-flex items-center px-3 py-1 text-xs font-semibold bg-red-100 text-red-700 rounded">
+          Nema na zalihi
+        </div>
+      <% end %>
+    </div>
+
+    <div class="border-t pt-6 mt-4 space-y-2">
+      <div class="flex justify-between max-w-sm">
+        <span class="text-gray-600">VPC</span>
+        <span class="font-semibold text-gray-900">
+          <%= number_to_currency(@product.vpc_cents / 100.0, unit: "€") %>
+        </span>
+      </div>
+
+      <div class="flex justify-between max-w-sm">
+        <span class="text-gray-600">PDV (25%)</span>
+        <span class="font-semibold text-gray-900">
+          <%= number_to_currency(@product.pdv_cents / 100.0, unit: "€") %>
+        </span>
+      </div>
+
+      <div class="flex justify-between max-w-sm border-t pt-2">
+        <span class="text-gray-700 font-medium">MPC</span>
+        <span class="text-2xl font-bold text-blue-600">
+          <%= number_to_currency(@product.mpc_cents / 100.0, unit: "€") %>
+        </span>
+      </div>
+    </div>
+
+    <% if @product.active? && @product.stock_quantity.to_i > 0 %>
+      <div class="mt-4 inline-block px-3 py-1 text-xs font-semibold bg-green-100 text-green-700 rounded">
+        Dostupan
+      </div>
+    <% else %>
+      <div class="mt-4 inline-block px-3 py-1 text-xs font-semibold bg-gray-100 text-gray-700 rounded">
+        Trenutno nije dostupan za narudžbu
+      </div>
+    <% end %>
+
+    <div class="mt-8">
+      <%= link_to "← Natrag na katalog",
+                  products_path,
+                  class: "px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-sm font-medium" %>
+    </div>
+
+  </div>
 </div>

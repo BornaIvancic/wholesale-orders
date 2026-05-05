@@ -1,0 +1,61 @@
+<div class="min-h-[80vh] flex items-center justify-center">
+  <div class="w-full max-w-md bg-white shadow-lg rounded-2xl p-8 border">
+
+    <h1 class="text-2xl font-bold mb-2 text-gray-900">Registracija</h1>
+    <p class="text-gray-600 mb-6">
+      Kreiraj WineHub račun i kreni s narudžbama.
+    </p>
+
+    <%= form_for(resource,
+                 as: resource_name,
+                 url: registration_path(resource_name),
+                 html: { class: "space-y-5" }) do |f| %>
+
+      <%= render "devise/shared/error_messages", resource: resource %>
+
+      <!-- Email -->
+      <div>
+        <%= f.label :email, "Email", class: "block text-sm font-semibold mb-1" %>
+        <%= f.email_field :email,
+                          autofocus: true,
+                          autocomplete: "email",
+                          class: "w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+      </div>
+
+      <!-- Password -->
+      <div>
+        <%= f.label :password, "Lozinka", class: "block text-sm font-semibold mb-1" %>
+
+        <% if @minimum_password_length %>
+          <p class="text-xs text-gray-500 mb-1">
+            Minimum <%= @minimum_password_length %> znakova
+          </p>
+        <% end %>
+
+        <%= f.password_field :password,
+                             autocomplete: "new-password",
+                             class: "w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+      </div>
+
+      <!-- Password confirmation -->
+      <div>
+        <%= f.label :password_confirmation, "Potvrdi lozinku", class: "block text-sm font-semibold mb-1" %>
+        <%= f.password_field :password_confirmation,
+                             autocomplete: "new-password",
+                             class: "w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+      </div>
+
+      <!-- Submit -->
+      <div>
+        <%= f.submit "Registriraj se",
+                     class: "w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition shadow" %>
+      </div>
+
+    <% end %>
+
+    <div class="mt-6 text-sm text-center text-gray-600">
+      <%= render "devise/shared/links" %>
+    </div>
+
+  </div>
+</div>

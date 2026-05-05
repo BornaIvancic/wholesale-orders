@@ -1,0 +1,20 @@
+<%= form_with url: url, method: :get, local: true, class: "flex flex-wrap items-end gap-3 mb-6" do %>
+  <div>
+    <label class="block text-sm font-semibold mb-1">Od</label>
+    <%= date_field_tag :from, params[:from], class: "rounded border-gray-300" %>
+  </div>
+
+  <div>
+    <label class="block text-sm font-semibold mb-1">Do</label>
+    <%= date_field_tag :to, params[:to], class: "rounded border-gray-300" %>
+  </div>
+
+  <%= submit_tag "Primijeni", class: "px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white font-semibold" %>
+
+  <%= link_to "CSV export",
+              url_for(params.permit(:from, :to).merge(format: :csv)),
+              class: "px-4 py-2 rounded bg-gray-100 hover:bg-gray-200 font-semibold" %>
+  <%= link_to "PDF Export",
+              url_for(format: :pdf, from: params[:from], to: params[:to]),
+              class: "px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded font-semibold" %>
+<% end %>

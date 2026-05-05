@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateOrderItems < ActiveRecord::Migration[8.1]
   def change
     create_table :order_items do |t|
@@ -11,6 +13,6 @@ class CreateOrderItems < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    add_index :order_items, [:order_id, :product_id], unique: true
+    add_index :order_items, %i[order_id product_id], unique: true
   end
 end

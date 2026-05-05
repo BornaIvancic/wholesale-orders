@@ -1,50 +1,80 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title><%= content_for(:title) || "Wholesale Orders" %></title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Wholesale Orders">
-    <meta name="mobile-web-app-capable" content="yes">
-    <%= csrf_meta_tags %>
-    <%= csp_meta_tag %>
+<head>
+  <title><%= content_for(:title) || "WineHub" %></title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="WineHub">
+  <meta name="mobile-web-app-capable" content="yes">
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
 
-    <%= yield :head %>
+  <%= yield :head %>
 
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+  <link rel="icon" href="/icon.png" type="image/png">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icon.png">
 
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
+  <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+  <%= javascript_importmap_tags %>
+</head>
 
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
-    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
-    <%= javascript_importmap_tags %>
-  </head>
+<body class="bg-gray-50 text-gray-900">
+<% nav_link        = "px-3 py-2 rounded text-gray-200 hover:bg-gray-700 hover:text-white transition" %>
+<% nav_link_active = "px-3 py-2 rounded bg-gray-900 text-white" %>
+<% btn_danger      = "px-3 py-2 rounded bg-red-600 hover:bg-red-700 text-white font-semibold transition" %>
 
-  <body>
-  <nav class="bg-gray-800 text-white px-6 py-4 flex gap-4">
-    <%= link_to "Home", root_path, class: "hover:underline" %>
-    <%= link_to "Katalog", products_path, class: "hover:underline" %>
-    <%= link_to "Narudžbe", orders_path, class: "hover:underline" %>
+<% nav_class = ->(path) { current_page?(path) ? nav_link_active : nav_link } %>
 
-    <% if user_signed_in? %>
-      <%= link_to "Profil", profile_path, class: "hover:underline" %>
+<nav class="bg-gray-800 text-gray-200">
+  <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <!-- Left -->
+    <div class="flex items-center gap-2">
+      <%= link_to "WineHub", root_path, class: "text-white font-bold text-lg mr-4" %>
 
-      <% if current_user.admin? %>
-        <%= link_to "Admin", admin_root_path, class: "hover:underline" %>
+      <%= link_to "Home", root_path, class: nav_class.call(root_path) %>
+      <%= link_to "Katalog", products_path, class: nav_class.call(products_path) %>
+
+      <% if user_signed_in? && current_user.admin? %>
+        <%= link_to "Narudžbe", admin_orders_path, class: nav_class.call(admin_orders_path) %>
+        <%= link_to "Partneri", admin_companies_path, class: nav_class.call(admin_companies_path) %>
+        <%= link_to "Proizvodi", admin_products_path, class: nav_class.call(admin_products_path) %>
+        <%= link_to "Izvještaji", admin_reports_path, class: nav_class.call(admin_reports_path) %>
+      <% else %>
+        <%= link_to "Narudžbe", orders_path, class: nav_class.call(orders_path) %>
       <% end %>
+    </div>
 
-      <%= button_to "Odjava", destroy_user_session_path, method: :delete, class: "hover:underline" %>
-    <% else %>
-      <%= link_to "Prijava", new_user_session_path, class: "hover:underline" %>
-      <%= link_to "Registracija", new_user_registration_path, class: "hover:underline" %>
-    <% end %>
-  </nav>
+    <!-- Right -->
+    <div class="flex items-center gap-2">
+      <% if user_signed_in? %>
+        <%= link_to "Profil", profile_path, class: nav_class.call(profile_path) %>
 
-  <main class="container mx-auto mt-10 px-5 flex">
-    <%= yield %>
-  </main>
-  </body>
+        <% if current_user.admin? %>
+          <%= link_to "Admin", admin_root_path, class: nav_class.call(admin_root_path) %>
+        <% end %>
+
+        <%= button_to "Odjava",
+                      destroy_user_session_path,
+                      method: :delete,
+                      form_class: "inline",
+                      class: btn_danger %>
+      <% else %>
+        <%= link_to "Prijava", new_user_session_path, class: nav_class.call(new_user_session_path) %>
+        <%= link_to "Registracija",
+                    new_user_registration_path,
+                    class: "px-3 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white font-semibold transition" %>
+      <% end %>
+    </div>
+  </div>
+</nav>
+
+<div id="flash" class="max-w-6xl mx-auto px-6 mt-6">
+  <%= render "shared/flash" %>
+</div>
+
+<main class="max-w-6xl mx-auto px-6 py-8">
+  <%= yield %>
+</main>
+</body>
 </html>

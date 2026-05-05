@@ -1,7 +1,15 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
 one:
-  name: MyString
+  name: Firma 1
+  discount_percent: 10
+  payment_terms_days: 14
+  city: Zagreb
+  street_address: Test 1
+  postal_code: 10000
 
 two:
-  name: MyString
+  name: Firma 2
+  discount_percent: 5
+  payment_terms_days: 7
+  city: Split
+  street_address: Test 2
+  postal_code: 21000

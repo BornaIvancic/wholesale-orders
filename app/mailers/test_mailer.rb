@@ -1,2 +1,4 @@
+
+
 class TestMailer < ApplicationMailer
 end

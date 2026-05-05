@@ -1,0 +1,32 @@
+<div class="min-h-[70vh] flex items-center justify-center">
+  <div class="w-full max-w-md bg-white border rounded-xl shadow-sm p-6">
+    <h1 class="text-2xl font-bold mb-2">Potvrda emaila</h1>
+    <p class="text-gray-600 mb-6">
+      Ako nisi dobio email za potvrdu računa, upiši email i poslat ćemo ti novi link.
+    </p>
+
+    <%= form_for(resource,
+                 as: resource_name,
+                 url: confirmation_path(resource_name),
+                 html: { method: :post, class: "space-y-4" }) do |f| %>
+
+      <%= render "devise/shared/error_messages", resource: resource %>
+
+      <div>
+        <%= f.label :email, "Email", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.email_field :email,
+                          autofocus: true,
+                          autocomplete: "email",
+                          value: (resource.pending_reconfirmation? ? resource.unconfirmed_email : resource.email),
+                          class: "w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+      </div>
+
+      <%= f.submit "Pošalji upute za potvrdu",
+                   class: "w-full inline-flex justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-white font-semibold hover:bg-blue-700 transition" %>
+    <% end %>
+
+    <div class="mt-6 text-sm text-gray-600">
+      <%= render "devise/shared/links" %>
+    </div>
+  </div>
+</div>

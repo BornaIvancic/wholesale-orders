@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_31_193137) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_16_124758) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -43,8 +43,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_31_193137) do
   end
 
   create_table "companies", force: :cascade do |t|
+    t.string "city"
     t.datetime "created_at", null: false
+    t.integer "discount_percent"
     t.string "name"
+    t.string "offers_email"
+    t.string "oib"
+    t.integer "payment_terms_days"
+    t.string "postal_code"
+    t.string "street_address"
     t.datetime "updated_at", null: false
   end
 
@@ -84,25 +91,37 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_31_193137) do
   end
 
   create_table "orders", force: :cascade do |t|
+    t.datetime "approved_at"
     t.bigint "company_id", null: false
     t.datetime "created_at", null: false
     t.integer "created_by_id", null: false
+    t.datetime "delivered_at"
+    t.text "delivery_address"
+    t.integer "discount_cents", default: 0, null: false
+    t.date "due_date"
     t.text "notes"
+    t.datetime "paid_at"
     t.integer "status", default: 0, null: false
+    t.integer "subtotal_cents", default: 0, null: false
     t.integer "total_cents", default: 0, null: false
     t.datetime "updated_at", null: false
+    t.integer "vat_cents", default: 0, null: false
     t.index ["company_id"], name: "index_orders_on_company_id"
     t.index ["created_by_id"], name: "index_orders_on_created_by_id"
   end
 
   create_table "products", force: :cascade do |t|
     t.boolean "active", default: true, null: false
+    t.string "category"
     t.datetime "created_at", null: false
+    t.string "image_url"
     t.string "name", null: false
     t.integer "price_cents", null: false
     t.string "sku", null: false
+    t.integer "stock_quantity", default: 0, null: false
     t.datetime "updated_at", null: false
     t.index ["sku"], name: "index_products_on_sku", unique: true
+    t.index ["stock_quantity"], name: "index_products_on_stock_quantity"
   end
 
   create_table "users", force: :cascade do |t|

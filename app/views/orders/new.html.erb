@@ -1,26 +1,103 @@
-<h1 class="text-2xl font-bold mb-6">Nova narudžba</h1>
+<div class="max-w-6xl mx-auto">
+  <h1 class="text-3xl font-bold mb-8">Nova narudžba</h1>
 
-<%= form_with url: orders_path, method: :post do %>
-  <table class="w-full border-collapse mb-6">
-    <thead>
-    <tr class="border-b">
-      <th class="text-left p-2">Proizvod</th>
-      <th class="text-left p-2">Cijena</th>
-      <th class="text-left p-2">Količina</th>
-    </tr>
-    </thead>
-    <tbody>
-    <% @products.each do |product| %>
-      <tr class="border-b">
-        <td class="p-2"><%= product.name %></td>
-        <td class="p-2"><%= number_to_currency(product.price_cents / 100.0, unit: "€") %></td>
-        <td class="p-2">
-          <%= number_field_tag "items[#{product.id}]", 0, min: 0, class: "border p-1 w-24" %>
-        </td>
+  <%= render "selected_items_summary", selected_items: @selected_items %>
+
+  <%= form_with url: new_order_path, method: :get, local: true, class: "bg-white border border-gray-200 rounded-xl shadow-sm p-4 mb-6" do |f| %>
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+      <div>
+        <%= f.label :query, "Pretraži", class: "block text-sm font-medium mb-1" %>
+        <%= f.text_field :query,
+                         value: params[:query],
+                         placeholder: "Naziv ili SKU",
+                         class: "w-full rounded-lg border-gray-300" %>
+      </div>
+
+      <div>
+        <%= f.label :category, "Kategorija", class: "block text-sm font-medium mb-1" %>
+        <%= f.select :category,
+                     options_for_select([["Sve kategorije", ""]] + @categories.map { |c| [c, c] }, params[:category]),
+                     {},
+                     class: "w-full rounded-lg border-gray-300" %>
+      </div>
+
+      <div>
+        <%= f.label :availability, "Dostupnost", class: "block text-sm font-medium mb-1" %>
+        <%= f.select :availability,
+                     options_for_select([
+                                          ["Sve", ""],
+                                          ["Na zalihi", "in_stock"],
+                                          ["Nema na zalihi", "out_of_stock"]
+                                        ], params[:availability]),
+                     {},
+                     class: "w-full rounded-lg border-gray-300" %>
+      </div>
+
+      <div>
+        <%= f.label :sort, "Sortiranje", class: "block text-sm font-medium mb-1" %>
+        <%= f.select :sort,
+                     options_for_select([
+                                          ["Naziv A-Z", "name_asc"],
+                                          ["Naziv Z-A", "name_desc"],
+                                          ["Cijena uzlazno", "price_asc"],
+                                          ["Cijena silazno", "price_desc"]
+                                        ], params[:sort]),
+                     {},
+                     class: "w-full rounded-lg border-gray-300" %>
+      </div>
+
+      <div class="flex gap-2">
+        <%= f.submit "Filtriraj",
+                     class: "px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition" %>
+
+        <%= link_to "Reset",
+                    new_order_path,
+                    class: "px-4 py-2 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300 transition" %>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="bg-white rounded-xl shadow overflow-hidden">
+    <table class="w-full">
+      <thead class="bg-gray-50 text-gray-600 text-sm uppercase tracking-wide">
+      <tr>
+        <th class="text-left px-4 py-3">Proizvod</th>
+        <th class="text-left px-4 py-3">VPC</th>
+        <th class="text-left px-4 py-3">PDV</th>
+        <th class="text-left px-4 py-3">MPC</th>
+        <th class="text-left px-4 py-3">Kategorija</th>
+        <th class="text-left px-4 py-3">Zaliha</th>
+        <th class="text-left px-4 py-3">Količina</th>
+        <th class="text-left px-4 py-3">Akcija</th>
       </tr>
-    <% end %>
-    </tbody>
-  </table>
+      </thead>
 
-  <%= submit_tag "Kreiraj narudžbu", class: "px-4 py-2 bg-green-600 text-white rounded" %>
-<% end %>
+      <tbody class="divide-y">
+      <% @products.each do |product| %>
+        <%= render "product_row", product: product, selected_items: @selected_items %>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-6 flex justify-center">
+    <%= paginate @products %>
+  </div>
+
+  <div class="mt-6 flex items-center justify-between">
+    <div class="text-sm text-gray-600">
+      U narudžbi je trenutno odabrano
+      <strong><%= @selected_items.values.map(&:to_i).sum %></strong>
+      artikala.
+    </div>
+
+    <%= form_with url: orders_path, method: :post, local: true do %>
+      <% @selected_items.each do |product_id, quantity| %>
+        <%= hidden_field_tag "items[#{product_id}]", quantity %>
+      <% end %>
+
+      <%= submit_tag "Kreiraj narudžbu",
+                     class: "px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 transition" %>
+    <% end %>
+  </div>
+</div>

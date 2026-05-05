@@ -1,4 +1,54 @@
-<div>
-  <h1 class="font-bold text-4xl">Home#index</h1>
-  <p>Find me in app/views/home/index.html.erb</p>
+<% btn_primary = "inline-flex items-center gap-2 px-5 py-3 rounded bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow" %>
+<% btn_secondary = "inline-flex items-center gap-2 px-5 py-3 rounded bg-gray-100 hover:bg-gray-200 text-gray-900 font-semibold" %>
+
+<div class="max-w-5xl mx-auto py-12 px-6">
+
+  <!-- HERO -->
+  <div class="mb-12">
+    <h1 class="text-4xl font-bold mb-4">
+      WineHub
+    </h1>
+    <p class="text-lg text-gray-600 max-w-2xl">
+      Sustav za upravljanje narudžbama, partnerima, rabatima, ponudama i naplatom.
+      Brzo, pregledno i poslovno točno.
+    </p>
+  </div>
+
+  <!-- ACTION CARDS -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+    <!-- Admin block -->
+    <div class="bg-white border rounded-xl p-6 shadow-sm">
+      <h2 class="text-xl font-bold mb-3">Admin</h2>
+      <p class="text-gray-600 mb-6">
+        Upravljanje proizvodima, partnerima, narudžbama, ponudama i naplatom.
+      </p>
+
+      <div class="flex flex-wrap gap-3">
+        <%= link_to "Narudžbe", admin_orders_path, class: btn_primary %>
+        <%= link_to "Proizvodi", admin_products_path, class: btn_secondary %>
+        <%= link_to "Partneri", admin_companies_path, class: btn_secondary %>
+      </div>
+    </div>
+
+    <!-- Partner block -->
+    <div class="bg-white border rounded-xl p-6 shadow-sm">
+      <h2 class="text-xl font-bold mb-3">Partner</h2>
+      <p class="text-gray-600 mb-6">
+        Pregled svojih narudžbi i kreiranje novih.
+      </p>
+
+      <div class="flex flex-wrap gap-3">
+        <%= link_to "Moje narudžbe", orders_path, class: btn_primary %>
+        <%= link_to "Nova narudžba", new_order_path, class: btn_secondary %>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER INFO -->
+  <div class="mt-16 text-sm text-gray-500">
+    <p>© <%= Time.current.year %> WineHub</p>
+  </div>
+
 </div>

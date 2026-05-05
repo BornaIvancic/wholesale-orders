@@ -1,34 +1,217 @@
-<h1 class="text-2xl font-bold mb-4">Narudžba #<%= @order.id %></h1>
-<p>Status: <strong><%= @order.status %></strong></p>
+<% btn_primary = "px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 transition" %>
+<% btn_secondary = "px-5 py-2.5 bg-gray-100 text-gray-800 font-semibold rounded-lg border hover:bg-gray-200 transition" %>
 
-<table class="w-full border-collapse mt-6">
-  <thead>
-  <tr class="border-b">
-    <th class="text-left p-2">Proizvod</th>
-    <th class="text-left p-2">Količina</th>
-    <th class="text-left p-2">Jed. cijena</th>
-    <th class="text-left p-2">Ukupno</th>
-  </tr>
-  </thead>
-  <tbody>
-  <% @order.order_items.includes(:product).each do |item| %>
-    <tr class="border-b">
-      <td class="p-2"><%= item.product.name %></td>
-      <td class="p-2"><%= item.quantity %></td>
-      <td class="p-2"><%= number_to_currency(item.unit_price_cents / 100.0, unit: "€") %></td>
-      <td class="p-2"><%= number_to_currency(item.line_total_cents / 100.0, unit: "€") %></td>
-    </tr>
-  <% end %>
-  </tbody>
-</table>
-<div class="mt-4 space-y-1">
-  <p>Subtotal: <%= number_to_currency(@order.subtotal_cents / 100.0, unit: "€") %></p>
-  <p>PDV (25%): <%= number_to_currency(@order.vat_cents / 100.0, unit: "€") %></p>
-  <p class="font-bold">
-    Ukupno s PDV-om: <%= number_to_currency(@order.grand_total_cents / 100.0, unit: "€") %>
-  </p>
+<div class="max-w-6xl mx-auto space-y-6">
+
+  <!-- HEADER -->
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold">Narudžba #<%= @order.id %></h1>
+
+      <div class="mt-2 flex flex-wrap items-center gap-2 text-sm">
+        <% status = @order.status.to_s %>
+        <% badge_class =
+             case status
+             when "draft" then "bg-gray-100 text-gray-800"
+             when "submitted" then "bg-yellow-100 text-yellow-800"
+             when "approved" then "bg-green-100 text-green-800"
+             when "preparing" then "bg-blue-100 text-blue-800"
+             when "shipped" then "bg-purple-100 text-purple-800"
+             when "delivered" then "bg-emerald-100 text-emerald-800"
+             when "rejected", "cancelled" then "bg-red-100 text-red-800"
+             else "bg-gray-100 text-gray-800"
+             end
+        %>
+
+        <span class="px-2.5 py-1 rounded-full font-semibold <%= badge_class %>">
+          <%= status %>
+        </span>
+
+        <% if @order.respond_to?(:due_date) && @order.due_date.present? %>
+          <span class="text-gray-600">
+            Rok plaćanja: <strong class="text-gray-900"><%= l(@order.due_date, format: :long) %></strong>
+          </span>
+        <% end %>
+      </div>
+    </div>
+    <div class="bg-white rounded-xl shadow p-5">
+      <h2 class="text-xl font-bold mb-3">Podaci partnera i dostave</h2>
+
+      <div class="space-y-2 text-sm text-gray-700">
+        <div>Naziv partnera: <strong class="text-gray-900"><%= @order.company.name %></strong></div>
+        <div>OIB: <strong class="text-gray-900"><%= @order.company.oib.presence || "-" %></strong></div>
+        <div>Adresa partnera: <strong class="text-gray-900"><%= @order.company.full_address.presence || "-" %></strong></div>
+        <div>Adresa dostave: <strong class="text-gray-900"><%= @order.delivery_address.presence || @order.company.full_address.presence || "-" %></strong></div>
+      </div>
+    </div>
+    <% if current_user.partner_user? && @order.draft? %>
+      <div class="bg-white rounded-xl shadow p-5">
+        <h2 class="text-xl font-bold mb-4">Adresa dostave</h2>
+
+        <%= form_with url: update_delivery_address_order_path(@order), method: :patch, local: true, class: "space-y-4" do %>
+          <div class="flex items-center gap-2">
+            <%= check_box_tag :use_custom_delivery_address, "1", false,
+                              class: "rounded border-gray-300",
+                              id: "use_custom_delivery_address" %>
+            <%= label_tag :use_custom_delivery_address, "Dostava na drugu adresu", class: "text-sm font-medium text-gray-700" %>
+          </div>
+
+          <div id="custom_delivery_address_box" class="hidden">
+            <%= label_tag :delivery_address, "Druga adresa dostave", class: "block text-sm font-medium text-gray-700 mb-1" %>
+            <%= text_area_tag :delivery_address,
+                              @order.delivery_address.presence || "",
+                              rows: 3,
+                              class: "w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500",
+                              placeholder: "npr. Heinzelova 12, 10000 Zagreb" %>
+          </div>
+
+          <div class="text-sm text-gray-600">
+            Zadana adresa firme:
+            <strong class="text-gray-900"><%= current_user.company.full_address.presence || "Nije unesena" %></strong>
+          </div>
+
+          <% if @order.delivery_address.present? %>
+            <div class="text-sm text-gray-600">
+              Trenutno spremljena adresa dostave:
+              <strong class="text-gray-900"><%= @order.delivery_address %></strong>
+            </div>
+          <% end %>
+
+          <%= submit_tag "Spremi adresu dostave",
+                         class: "px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 transition" %>
+        <% end %>
+      </div>
+
+      <script>
+          document.addEventListener("DOMContentLoaded", function () {
+              const checkbox = document.getElementById("use_custom_delivery_address");
+              const box = document.getElementById("custom_delivery_address_box");
+              if (!checkbox || !box) return;
+
+              function toggleBox() {
+                  box.classList.toggle("hidden", !checkbox.checked);
+              }
+
+              checkbox.addEventListener("change", toggleBox);
+              toggleBox();
+          });
+      </script>
+    <% end %>
+
+    <!-- ACTIONS -->
+    <div class="flex gap-2 flex-wrap">
+      <% if current_user.partner_user? && @order.draft? %>
+        <%= button_to "Pošalji narudžbu",
+                      submit_order_path(@order),
+                      method: :post,
+                      data: { turbo_confirm: "Sigurno poslati narudžbu?" },
+                      class: btn_primary %>
+      <% end %>
+
+      <%= link_to "Nazad na narudžbe", orders_path, class: btn_secondary %>
+    </div>
+  </div>
+
+  <!-- CONTENT GRID -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+
+    <!-- ITEMS TABLE -->
+    <div class="lg:col-span-2 bg-white rounded-xl shadow overflow-hidden">
+      <div class="px-4 py-3 border-b bg-gray-50">
+        <h2 class="font-bold">Stavke narudžbe</h2>
+      </div>
+
+      <table class="w-full">
+        <thead class="text-xs uppercase tracking-wide text-gray-600 bg-gray-50 border-b">
+        <tr>
+          <th class="text-left px-4 py-3">Proizvod</th>
+          <th class="text-left px-4 py-3">Količina</th>
+          <th class="text-left px-4 py-3">VPC</th>
+          <th class="text-left px-4 py-3">PDV</th>
+          <th class="text-left px-4 py-3">MPC</th>
+          <th class="text-left px-4 py-3">Iznos</th>
+        </tr>
+        </thead>
+
+        <tbody class="divide-y">
+        <% @order.order_items.includes(:product).each do |item| %>
+          <tr class="hover:bg-gray-50 transition">
+            <td class="px-4 py-3 font-medium"><%= item.product.name %></td>
+            <td class="px-4 py-3 text-gray-700"><%= item.quantity %></td>
+            <td class="px-4 py-3 text-gray-700">
+              <%= number_to_currency(item.unit_price_cents / 100.0, unit: "€") %>
+            </td>
+
+            <td class="px-4 py-3 text-gray-700">
+              <%= number_to_currency(item.unit_vat_cents / 100.0, unit: "€") %>
+            </td>
+
+            <td class="px-4 py-3 text-gray-700">
+              <%= number_to_currency(item.unit_mpc_cents / 100.0, unit: "€") %>
+            </td>
+
+            <td class="px-4 py-3 font-semibold">
+              <%= number_to_currency(item.line_mpc_cents / 100.0, unit: "€") %>
+            </td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- TOTALS CARD -->
+    <div class="bg-white rounded-xl shadow p-5">
+      <h2 class="font-bold mb-4">Sažetak</h2>
+
+      <div class="space-y-2 text-sm">
+        <div class="flex justify-between">
+          <span class="text-gray-600">Subtotal</span>
+          <span class="font-medium"><%= number_to_currency(@order.subtotal_cents / 100.0, unit: "€") %></span>
+        </div>
+
+        <div class="flex justify-between">
+          <span class="text-gray-600">PDV (25%)</span>
+          <span class="font-medium"><%= number_to_currency(@order.vat_cents / 100.0, unit: "€") %></span>
+        </div>
+
+        <div class="border-t pt-3 mt-3 flex justify-between text-base font-bold">
+          <span>Ukupno</span>
+          <span><%= number_to_currency(@order.grand_total_cents / 100.0, unit: "€") %></span>
+        </div>
+
+        <div class="pt-2 text-xs text-gray-500">
+          Datum kreiranja: <%= l(@order.created_at, format: :short) %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATUS HISTORY -->
+  <div class="bg-white rounded-xl shadow p-5">
+    <h2 class="text-xl font-bold mb-3">Povijest statusa</h2>
+
+    <% histories = @order.order_status_histories.order(created_at: :asc) %>
+    <% if histories.any? %>
+      <ul class="space-y-2 text-sm">
+        <% histories.each do |h| %>
+          <li class="flex flex-col md:flex-row md:items-center md:justify-between gap-1 border-b last:border-b-0 pb-2 last:pb-0">
+            <div class="text-gray-700">
+              <strong><%= Order.statuses.key(h.from_status) %></strong>
+              →
+              <strong><%= Order.statuses.key(h.to_status) %></strong>
+              <% if h.note.present? %>
+                <span class="text-gray-500">— <%= h.note %></span>
+              <% end %>
+            </div>
+            <div class="text-gray-500 text-xs">
+              <%= l(h.created_at, format: :short) %> · <%= h.changed_by.email %>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="text-gray-600">Još nema promjena statusa.</p>
+    <% end %>
+  </div>
+
 </div>
-
-<p class="mt-4 font-bold">
-  Ukupno: <%= number_to_currency(@order.total_cents / 100.0, unit: "€") %>
-</p>

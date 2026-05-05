@@ -1,37 +1,69 @@
-<%= form_with model: [:admin, @product], local: true do |f| %>
-  <% if @product.errors.any? %>
-    <div class="mb-4 p-3 border border-red-400 bg-red-50">
-      <ul>
-        <% @product.errors.full_messages.each do |msg| %>
-          <li class="text-red-700"><%= msg %></li>
-        <% end %>
-      </ul>
+<div class="max-w-2xl mx-auto bg-white shadow rounded-xl p-8">
+
+  <h1 class="text-2xl font-bold mb-6">
+    <%= @product.persisted? ? "Uredi proizvod" : "Novi proizvod" %>
+  </h1>
+
+  <%= form_with model: [:admin, @product], local: true, class: "space-y-6" do |f| %>
+
+    <% if @product.errors.any? %>
+      <div class="p-4 rounded-lg bg-red-50 border border-red-300">
+        <h2 class="font-semibold text-red-700 mb-2">
+          Pogreške:
+        </h2>
+        <ul class="list-disc pl-5 space-y-1">
+          <% @product.errors.full_messages.each do |msg| %>
+            <li class="text-red-700 text-sm"><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div>
+      <%= f.label :name, "Naziv", class: "block text-sm font-semibold mb-1" %>
+      <%= f.text_field :name,
+                       class: "w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 shadow-sm" %>
     </div>
+
+    <div>
+      <%= f.label :sku, "SKU", class: "block text-sm font-semibold mb-1" %>
+      <%= f.text_field :sku,
+                       class: "w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 shadow-sm" %>
+    </div>
+
+    <div>
+      <%= f.label :price_cents, "MPC (u centima)", class: "block text-sm font-semibold mb-1" %>
+      <%= f.number_field :price_cents,
+                         class: "w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 shadow-sm" %>
+      <p class="text-xs text-gray-500 mt-1">
+        Primjer: 1250 = 12,50 €. VPC i PDV izračunavaju se automatski iz MPC-a.
+      </p>
+    </div>
+
+    <div>
+      <%= f.label :stock_quantity, "Zaliha", class: "block text-sm font-semibold mb-1" %>
+      <%= f.number_field :stock_quantity,
+                         min: 0,
+                         class: "w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 shadow-sm" %>
+      <p class="text-xs text-gray-500 mt-1">
+        Broj komada koji je trenutno dostupan.
+      </p>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <%= f.check_box :active,
+                      class: "rounded border-gray-300 text-blue-600 focus:ring-blue-500" %>
+      <%= f.label :active, "Aktivan", class: "text-sm font-medium" %>
+    </div>
+
+    <div class="flex gap-3 pt-4">
+      <%= f.submit @product.persisted? ? "Spremi promjene" : "Kreiraj proizvod",
+                   class: "px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow transition" %>
+
+      <%= link_to "Natrag",
+                  admin_products_path,
+                  class: "px-5 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg transition" %>
+    </div>
+
   <% end %>
-
-  <div class="mb-4">
-    <%= f.label :name, "Naziv", class: "block font-semibold" %>
-    <%= f.text_field :name, class: "border p-2 w-full" %>
-  </div>
-
-  <div class="mb-4">
-    <%= f.label :sku, "SKU", class: "block font-semibold" %>
-    <%= f.text_field :sku, class: "border p-2 w-full" %>
-  </div>
-
-  <div class="mb-4">
-    <%= f.label :price_cents, "Cijena (u centima)", class: "block font-semibold" %>
-    <%= f.number_field :price_cents, class: "border p-2 w-full" %>
-  </div>
-
-  <div class="mb-4">
-    <%= f.label :active, "Aktivan" %>
-    <%= f.check_box :active %>
-  </div>
-
-  <div class="mt-6">
-    <%= f.submit class: "px-4 py-2 bg-green-600 text-white rounded" %>
-    <%= link_to "Odustani", admin_products_path,
-                class: "ml-4 underline" %>
-  </div>
-<% end %>
+</div>

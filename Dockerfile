@@ -2,8 +2,8 @@
 # check=error=true
 
 # This Dockerfile is designed for production, not development. Use with Kamal or build'n'run by hand:
-# docker build -t wholesale_orders .
-# docker run -d -p 80:80 -e RAILS_MASTER_KEY=<value from config/master.key> --name wholesale_orders wholesale_orders
+# docker build -t winehub .
+# docker run -d -p 80:80 -e RAILS_MASTER_KEY=<value from config/master.key> --name winehub winehub
 
 # For a containerized dev environment, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
 
