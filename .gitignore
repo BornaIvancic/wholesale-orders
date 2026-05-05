@@ -40,3 +40,4 @@
 # RubyMine / IntelliJ
 .idea/
 *.iml
+.DS_Store
